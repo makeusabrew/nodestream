@@ -12,11 +12,19 @@ util.debug("connected to pull & push servers");
 var repData = {};
 queue.on('message', function(data) {
     try {
+        // rebuild the tweet
         data = JSON.parse(data);
-        repData.text = data.text;
+        // @todo more processing here...
+
+        // stick the processed tweet on another queue
+        repData = {
+            text: data.text,
+            user: data.user.screen_name
+        };
         push.send(JSON.stringify(repData));
+        util.debug("OK");
     } catch (e) {
-        util.debug(data);
+        util.debug("parse failed");
     }
 });
 

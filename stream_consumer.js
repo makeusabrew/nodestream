@@ -18,20 +18,23 @@ s.bind('tcp://127.0.0.1:5554', function(err) {
     util.debug('bound ZMQ push server');
 });
     
-var tweet = '';
 var strpos = -1;
 
+var index = 0;
+
+var tweet = '';
+
 http.get(options, function(res) {
+    res.setEncoding("utf8");
     res.on('data', function(chunk) {
-        chunk = chunk.toString();
-        strpos = chunk.indexOf('\r');
+        tweet += chunk;
+        strpos = tweet.indexOf("\r");
 
         if (strpos !== -1) {
-            tweet += chunk.substr(0, strpos);
-            s.send(tweet);
-            tweet = '';
-        } else {
-            tweet += chunk;
+            // bung the completed tweet on the queue
+            s.send(tweet.substr(0, strpos));
+            // make sure we don't lose the remainder
+            tweet = tweet.substr(strpos+1);
         }
     });
     res.on('end', function() {
