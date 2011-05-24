@@ -19,9 +19,6 @@ s.bind('tcp://127.0.0.1:5554', function(err) {
 });
     
 var strpos = -1;
-
-var index = 0;
-
 var tweet = '';
 
 http.get(options, function(res) {
