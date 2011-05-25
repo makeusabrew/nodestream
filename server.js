@@ -27,24 +27,20 @@ queue.bind('tcp://127.0.0.1:5556', function(err) {
     util.debug('bound ZMQ pull server');
 
     queue.on('message', function(data) {
-        //util.debug(data);
         var details = JSON.parse(data);
         if (details.urls) {
-            /*
-            db.collection('tweets', function(err, collection) {
-                if (err) throw err;
-                collection.insert(details);
-            });
-            */
+            // got urls? great!
             db.collection('urls', function(err, collection) {
                 if (err) throw err;
+                // loop over them one by one
                 details.urls.forEach(function(url) {
+                    // set a redis key to quickly count the occurences
                     redis.incr(url, function(err, val) {
-                        util.debug(val);
                         var data = {
                             "url": url,
                             "count": val
                         };
+                        // slap the record in our DB or update it if it exists
                         collection.update({url: url}, {$set: data}, {upsert:true});
                     });
                 });
@@ -59,7 +55,7 @@ queue.bind('tcp://127.0.0.1:5556', function(err) {
 var app = express.createServer();
 
 app.configure(function() {
-    app.use(express.logger());
+    //app.use(express.logger());
     app.use(express.bodyParser());
     app.use(app.router);
     app.use(express.static(__dirname + '/../public'));
@@ -68,7 +64,12 @@ app.configure(function() {
 });
 
 app.get('/', function(req, res) {
-    res.send("OK");
+    db.collection('urls', function(err, collection) {
+        if (err) throw err;
+        collection.find({}, {limit: 1, sort:[['count','desc']]}).nextObject(function(err, docs) {
+            res.send(docs);
+        });
+    });
 });
 
 
