@@ -13,7 +13,12 @@
             socket.connect();
             socket.on('message', function(data) {
                 data = JSON.parse(data);
-                $("#data").html(data.url+" "+data.count);
+                var rElem = $("<div id='data' />");
+                for (var i = 0, j = data.length; i < j; i++) {
+                    var elem = $("<div />").html('<a href="'+data[i].url+'">'+data[i].url+'</a> - '+data[i].count);
+                    rElem.append(elem);
+                }
+                $("#data").replaceWith(rElem);
             });
         </script>
     </body>
