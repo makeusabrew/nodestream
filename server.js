@@ -79,3 +79,15 @@ app.listen(8124);
  * Socket stuff
  */
 var socket = io.listen(app);
+var cacheId = null;
+setInterval(function() {
+    db.collection('urls', function(err, collection) {
+        collection.find({}, {limit: 1, sort:[['count','desc']]}).nextObject(function(err, docs) {
+            //res.send(docs);
+            if (docs._id != cacheId) {
+                cacheId = docs._id;
+                socket.broadcast(docs);
+            }
+        });
+    });
+}, 2000);
