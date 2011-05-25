@@ -82,11 +82,12 @@ var socket = io.listen(app);
 var cacheId = null;
 setInterval(function() {
     db.collection('urls', function(err, collection) {
+        if (err) throw err;
         collection.find({}, {limit: 1, sort:[['count','desc']]}).nextObject(function(err, docs) {
-            //res.send(docs);
-            if (docs._id != cacheId) {
+            if (err) throw err;
+            if (docs && docs._id != cacheId) {
                 cacheId = docs._id;
-                socket.broadcast(docs);
+                socket.broadcast(JSON.stringify(docs));
             }
         });
     });

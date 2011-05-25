@@ -4,6 +4,17 @@
         <title>NodeStream</title>
     </head>
     <body>
-        <h1>Hi</h1>
+        <h1>Top URLs</h1>
+        <div id="data"></div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script> 
+        <script> 
+            var socket = new io.Socket(); 
+            socket.connect();
+            socket.on('message', function(data) {
+                data = JSON.parse(data);
+                $("#data").html(data.url+" "+data.count);
+            });
+        </script>
     </body>
 </html>
