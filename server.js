@@ -58,7 +58,7 @@ app.configure(function() {
     //app.use(express.logger());
     app.use(express.bodyParser());
     app.use(app.router);
-    app.use(express.static(__dirname + '/../public'));
+    app.use(express.static(__dirname + '/public'));
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     app.set('view engine', 'jade');
 });
